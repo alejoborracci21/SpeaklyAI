@@ -1,7 +1,11 @@
-export default function Challenge() {
-  return (
-    <div>
-      <h1 className="text-3xl font-bold underline">Challenge</h1>
-    </div>
-  );
-}
+
+"use client";
+
+export default function Challenge() {  
+    return (
+        <div>
+        <h1>Challenge</h1>
+        <p>Welcome to the challenge page!</p>
+        </div>
+    );
+    }
