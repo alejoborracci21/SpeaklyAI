@@ -1,10 +1,20 @@
-"use client";
+"use client"
 
-export default function Profile() {   
+import Header from "@/components/profile/header"
+import Dashboard from "@/components/profile/dashboard"
+
+
+export default function Profile() {
+
   return (
-    <div>
-      <h1>Profile</h1>
-      <p>Welcome to the profile page!</p>
+    <div className="min-h-screen bg-base-100 flex">
+
+
+      {/* Mobile header */}
+      <Header />
+      
+      {/* Dashboard */}
+      <Dashboard />
     </div>
-  );
+  )
 }
