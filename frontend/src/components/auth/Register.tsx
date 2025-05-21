@@ -30,7 +30,8 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
       // 3) Envío al backend
       await createUserInBackend(token, { nombre: fullName });
       toast("Usuario registrado correctamente")
-    } catch  {
+    } catch (error) {
+      console.error('Error al registrarse:', error);
       toast("Error al registrarse")
     } finally {
       setLoading(false);
