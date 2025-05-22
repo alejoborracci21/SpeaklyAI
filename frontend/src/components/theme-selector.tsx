@@ -10,7 +10,7 @@ export function ThemeSelector() {
     }
   }, []);
 
-  const themes = ["light", "dark", "cupcake", "bumblebee", "emerald"];
+  const themes = ["light", "dracula", "cupcake", "aqua", "garden", "retro", "nord"];
 
   const changeTheme = (theme: string) => {
     document.documentElement.setAttribute("data-theme", theme);
