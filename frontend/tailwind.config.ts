@@ -8,7 +8,12 @@ const config: Config = {
     "./pages/**/*.{ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: 'var(--font-montserrat)',
+        chewy: 'var(--font-chewy)',
+      },
+    },
   },
   plugins: [],
 };

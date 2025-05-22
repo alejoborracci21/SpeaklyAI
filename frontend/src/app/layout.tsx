@@ -3,6 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Poppins } from 'next/font/google'
 import { Toaster } from "@/components/ui/sonner"
 
+import { Montserrat, Chewy } from "next/font/google"
+
+const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat" })
+const chewy = Chewy({ subsets: ["latin"], weight: "400", variable: "--font-chewy" })
+
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${montserrat.variable} ${chewy.variable}`}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.className} antialiased`}
       >
