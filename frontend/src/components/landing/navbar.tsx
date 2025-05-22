@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { BookOpen } from "lucide-react"
 import { ThemeSelector } from "../theme-selector"
 
 export function Navbar() {
@@ -11,7 +10,7 @@ export function Navbar() {
         {/* Logo */}
         <div className="navbar-start">
           <Link href="/" className="btn btn-ghost text-xl">
-            <BookOpen className="w-6 h-6 mr-2" /> SpeaklyAI
+            SpeaklyAI
           </Link>
         </div>
 
