@@ -9,10 +9,10 @@ import { Edit, Camera, Star } from 'lucide-react'
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false)
-  const [name, setName] = useState('Ana García')
-  const [username, setUsername] = useState('anagarcia')
-  const [email, setEmail] = useState('ana.garcia@example.com')
-  const [bio, setBio] = useState('¡Hola! Estoy aprendiendo inglés para mi trabajo y viajes.')
+  const [name] = useState('Ana García')
+  const [username] = useState('anagarcia')
+  const [email] = useState('ana.garcia@example.com')
+  const [bio] = useState('¡Hola! Estoy aprendiendo inglés para mi trabajo y viajes.')
 
   const router = useRouter()
 
