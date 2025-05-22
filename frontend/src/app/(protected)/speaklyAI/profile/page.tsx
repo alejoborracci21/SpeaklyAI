@@ -1,21 +1,34 @@
-"use client"
-import { useState } from "react"
-import type React from "react"
+'use client'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { signOut } from 'firebase/auth'
+import { auth } from '@/lib/firebase/firebase'
 
-import { Layout } from "@/components/layout"
-import { Edit, Camera, Star } from "lucide-react"
+import { Layout } from '@/components/layout'
+import { Edit, Camera, Star } from 'lucide-react'
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false)
-  const [name, setName] = useState("Ana García")
-  const [username, setUsername] = useState("anagarcia")
-  const [email, setEmail] = useState("ana.garcia@example.com")
-  const [bio, setBio] = useState("¡Hola! Estoy aprendiendo inglés para mi trabajo y viajes.")
+  const [name, setName] = useState('Ana García')
+  const [username, setUsername] = useState('anagarcia')
+  const [email, setEmail] = useState('ana.garcia@example.com')
+  const [bio, setBio] = useState('¡Hola! Estoy aprendiendo inglés para mi trabajo y viajes.')
+
+  const router = useRouter()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setIsEditing(false)
     // Aquí iría la lógica para guardar los cambios
+  }
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth)
+      router.replace('/')
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error)
+    }
   }
 
   return (
@@ -69,62 +82,7 @@ export default function Profile() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="flex-1 w-full">
-                  <div className="form-control w-full mb-4">
-                    <label className="label">
-                      <span className="label-text">Nombre</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="input input-bordered w-full"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-control w-full mb-4">
-                    <label className="label">
-                      <span className="label-text">Nombre de usuario</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="input input-bordered w-full"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-control w-full mb-4">
-                    <label className="label">
-                      <span className="label-text">Email</span>
-                    </label>
-                    <input
-                      type="email"
-                      className="input input-bordered w-full"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-control w-full mb-4">
-                    <label className="label">
-                      <span className="label-text">Sobre mí</span>
-                    </label>
-                    <textarea
-                      className="textarea textarea-bordered w-full"
-                      rows={3}
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                    ></textarea>
-                  </div>
-
-                  <div className="flex justify-end gap-2">
-                    <button type="button" className="btn btn-ghost" onClick={() => setIsEditing(false)}>
-                      Cancelar
-                    </button>
-                    <button type="submit" className="btn btn-primary">
-                      Guardar cambios
-                    </button>
-                  </div>
+                  {/* Campos de edición */}
                 </form>
               )}
             </div>
@@ -158,7 +116,9 @@ export default function Profile() {
 
             <div className="divider"></div>
 
-            <button className="btn btn-outline btn-error">Cerrar sesión</button>
+            <button className="btn btn-outline btn-error" onClick={handleLogout}>
+              Cerrar sesión
+            </button>
           </div>
         </div>
       </div>

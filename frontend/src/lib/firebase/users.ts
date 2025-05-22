@@ -38,3 +38,20 @@ export async function getUserInBackend(token: string) {
 
   return await res.json();
 }
+
+export async function updateUserInBackend(token: string, data: { score: number }) {
+  const res = await fetch(`${url}/usuario`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    throw new Error('Error al actualizar usuario en backend');
+  }
+
+  return await res.json();
+}

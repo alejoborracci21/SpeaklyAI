@@ -1,7 +1,6 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Layout } from "@/components/layout"
 import { CheckCircle, XCircle, AlertCircle } from "lucide-react"
 
 export default function LevelTest() {
@@ -138,11 +137,10 @@ export default function LevelTest() {
   }
 
   const finishTest = () => {
-    router.push("/home")
+    router.push("/speaklyAI/profile")
   }
 
   return (
-    <Layout>
       <div className="max-w-2xl mx-auto">
         {!testCompleted ? (
           <div className="card bg-base-100 shadow-xl">
@@ -233,6 +231,5 @@ export default function LevelTest() {
           </div>
         )}
       </div>
-    </Layout>
   )
 }
