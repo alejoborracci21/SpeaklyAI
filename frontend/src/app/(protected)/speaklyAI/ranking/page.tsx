@@ -81,8 +81,8 @@ export default function Leaderboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
-                    <tr key={user.uidFirebase}>
+                  {users.map((user, index) => (
+                    <tr key={index}>
                       <td className="flex items-center justify-center">
                         {getRankIcon(user.rank)}
                       </td>
