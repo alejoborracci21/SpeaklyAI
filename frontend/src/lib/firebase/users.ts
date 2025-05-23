@@ -23,7 +23,6 @@ export async function createUserInBackend(token: string, data: { nombre: string 
 }
 
 export async function getUserInBackend(token: string) {
-
   const res = await fetch(`${url}/auth/login`, {
     method: 'POST',
     headers: {
@@ -70,4 +69,21 @@ export async function getAllUsers(token: string) {
   }
 
   return await res.json();
+}
+
+
+export async function addScoreToUser(token: string, score: number) {
+  const res = await fetch(`${url}/usuario`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ score: score }),
+  });
+
+  if (!res.ok) {
+    throw new Error('Error al añadir puntuación al usuario en backend');
+  }
+
 }

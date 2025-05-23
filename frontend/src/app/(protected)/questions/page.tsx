@@ -2,146 +2,87 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCircle, XCircle, AlertCircle } from "lucide-react"
-
+import { questions } from "./questions"
+import { getFirebaseToken } from "@/lib/firebase/getFirebaseToken"
+import { addScoreToUser } from "@/lib/firebase/users"
+import { toast } from "sonner"
 export default function LevelTest() {
   const router = useRouter()
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [score, setScore] = useState(0)
   const [attempts, setAttempts] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
-  const [selectedOption, setSelectedOption] = useState<number | null>(null)
+  const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const [testCompleted, setTestCompleted] = useState(false)
 
-  // Preguntas de ejemplo para el test de nivel
-  const questions = [
-    {
-      word: "Ubiquitous",
-      options: ["Omnipresente", "Único", "Inusual"],
-      correctAnswer: 0,
-      translation: "Omnipresente",
-    },
-    {
-      word: "Ephemeral",
-      options: ["Eterno", "Pasajero", "Importante"],
-      correctAnswer: 1,
-      translation: "Pasajero/Efímero",
-    },
-    {
-      word: "Pragmatic",
-      options: ["Teórico", "Idealista", "Práctico"],
-      correctAnswer: 2,
-      translation: "Práctico",
-    },
-    {
-      word: "Ambiguous",
-      options: ["Ambiguo", "Claro", "Preciso"],
-      correctAnswer: 0,
-      translation: "Ambiguo",
-    },
-    {
-      word: "Meticulous",
-      options: ["Descuidado", "Meticuloso", "Rápido"],
-      correctAnswer: 1,
-      translation: "Meticuloso",
-    },
-    {
-      word: "Eloquent",
-      options: ["Silencioso", "Tímido", "Elocuente"],
-      correctAnswer: 2,
-      translation: "Elocuente",
-    },
-    {
-      word: "Benevolent",
-      options: ["Benévolo", "Malvado", "Neutral"],
-      correctAnswer: 0,
-      translation: "Benévolo",
-    },
-    {
-      word: "Diligent",
-      options: ["Perezoso", "Diligente", "Descuidado"],
-      correctAnswer: 1,
-      translation: "Diligente",
-    },
-    {
-      word: "Resilient",
-      options: ["Frágil", "Débil", "Resistente"],
-      correctAnswer: 2,
-      translation: "Resistente",
-    },
-    {
-      word: "Verbose",
-      options: ["Verboso", "Conciso", "Silencioso"],
-      correctAnswer: 0,
-      translation: "Verboso",
-    },
-  ]
-
-  const handleOptionSelect = (optionIndex: number) => {
+  const handleOptionSelect = (optionId: string) => {
     if (showAnswer) return
 
-    setSelectedOption(optionIndex)
-    setAttempts(attempts + 1)
+    setSelectedOption(optionId)
+    setAttempts(prev => prev + 1)
 
-    if (optionIndex === questions[currentQuestion].correctAnswer) {
-      // Respuesta correcta
-      const pointsEarned = attempts === 0 ? 2 : 1 // 2 puntos en primer intento, 1 en segundo
-      setScore(score + pointsEarned)
+    if (optionId === questions[currentQuestion].correct) {
+      // Respuesta correcta: sumar 75 puntos
+      setScore(prev => prev + 75)
 
       // Mostrar toast de éxito
       const toast = document.createElement("div")
       toast.className = "toast toast-top toast-end"
       toast.innerHTML = `
-        <div class="alert alert-success">
-          <span>¡Correcto! +${pointsEarned} puntos</span>
+        <div class=\"alert alert-success\">
+          <span>¡Correcto! +75 puntos</span>
         </div>
       `
       document.body.appendChild(toast)
-
-      // Eliminar el toast después de 2 segundos
       setTimeout(() => {
         document.body.removeChild(toast)
       }, 2000)
 
-      // Pasar a la siguiente pregunta después de un breve retraso
-      setTimeout(() => {
-        nextQuestion()
-      }, 1000)
+      setTimeout(() => nextQuestion(), 1000)
     } else if (attempts >= 1) {
-      // Segundo intento fallido, mostrar respuesta correcta
+      // Segundo intento fallido, mostrar respuesta
       setShowAnswer(true)
-
-      // Pasar a la siguiente pregunta después de mostrar la respuesta
-      setTimeout(() => {
-        nextQuestion()
-      }, 2000)
+      setTimeout(() => nextQuestion(), 2000)
     }
   }
 
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
+      setCurrentQuestion(prev => prev + 1)
       setAttempts(0)
       setShowAnswer(false)
       setSelectedOption(null)
     } else {
-      // Test completado
       setTestCompleted(true)
     }
   }
 
   const getLevel = () => {
-    const percentage = (score / (questions.length * 2)) * 100
+    const totalPoints = questions.length * 75
+    const percentage = (score / totalPoints) * 100
     if (percentage >= 80) return "Avanzado"
     if (percentage >= 50) return "Intermedio"
     return "Principiante"
   }
 
-  const finishTest = () => {
+  const finishTest = async () => {
+    const token = await getFirebaseToken()
+    console.log("Token:", token)
+    if (!token) return toast.error("Error al obtener el token del usuario")
+    await addScoreToUser(token.toString(), score)
     router.push("/speaklyAI/profile")
   }
 
+  const correctText = () => {
+    const correctOption = questions[currentQuestion].options.find(
+      opt => opt.id === questions[currentQuestion].correct
+    )
+    return correctOption?.text || ""
+  }
+
   return (
-      <div className="max-w-2xl mx-auto">
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="max-w-2xl w-full">
         {!testCompleted ? (
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
@@ -154,44 +95,46 @@ export default function LevelTest() {
 
               <progress
                 className="progress progress-primary w-full mb-6"
-                value={currentQuestion}
-                max={questions.length - 1}
+                value={currentQuestion + 1}
+                max={questions.length}
               ></progress>
 
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold mb-2">¿Qué significa &quot;{questions[currentQuestion].word}&quot;?</h3>
+                <h3 className="text-2xl font-bold mb-2">
+                  {questions[currentQuestion].prompt}
+                </h3>
                 {showAnswer && (
                   <div className="alert alert-info mt-2">
                     <AlertCircle className="w-5 h-5" />
-                    <span>Traducción: {questions[currentQuestion].translation}</span>
+                    <span>Respuesta: {correctText()}</span>
                   </div>
                 )}
               </div>
 
               <div className="grid gap-4">
-                {questions[currentQuestion].options.map((option, index) => (
+                {questions[currentQuestion].options.map(option => (
                   <button
-                    key={index}
+                    key={option.id}
                     className={`btn btn-lg justify-start ${
-                      selectedOption === index
-                        ? index === questions[currentQuestion].correctAnswer
+                      selectedOption === option.id
+                        ? option.id === questions[currentQuestion].correct
                           ? "btn-success"
                           : "btn-error"
                         : "btn-outline"
-                    } ${showAnswer && index === questions[currentQuestion].correctAnswer ? "btn-success" : ""}`}
-                    onClick={() => handleOptionSelect(index)}
+                    } ${showAnswer && option.id === questions[currentQuestion].correct ? "btn-success" : ""}`}
+                    onClick={() => handleOptionSelect(option.id)}
                     disabled={showAnswer}
                   >
-                    {selectedOption === index ? (
-                      index === questions[currentQuestion].correctAnswer ? (
+                    {selectedOption === option.id ? (
+                      option.id === questions[currentQuestion].correct ? (
                         <CheckCircle className="w-5 h-5 mr-2" />
                       ) : (
                         <XCircle className="w-5 h-5 mr-2" />
                       )
                     ) : (
-                      <span className="w-5 h-5 mr-2">{index + 1}</span>
+                      <span className="w-5 h-5 mr-2">{option.id.toUpperCase()}</span>
                     )}
-                    {option}
+                    {option.text}
                   </button>
                 ))}
               </div>
@@ -215,7 +158,7 @@ export default function LevelTest() {
                 <div className="stat">
                   <div className="stat-title">Puntuación</div>
                   <div className="stat-value">
-                    {score}/{questions.length * 2}
+                    {score}/{questions.length * 75}
                   </div>
                 </div>
                 <div className="stat">
@@ -231,5 +174,6 @@ export default function LevelTest() {
           </div>
         )}
       </div>
+    </div>
   )
 }
