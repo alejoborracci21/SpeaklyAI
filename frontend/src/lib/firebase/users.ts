@@ -55,3 +55,19 @@ export async function updateUserInBackend(token: string, data: { score: number }
 
   return await res.json();
 }
+
+export async function getAllUsers(token: string) {
+  const res = await fetch(`${url}/usuario`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error('Error al obtener usuarios en backend');
+  }
+
+  return await res.json();
+}

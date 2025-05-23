@@ -1,25 +1,50 @@
+'use client'
+
 import { Layout } from "@/components/layout"
 import { Trophy, Medal, Award } from "lucide-react"
+import { getAllUsers } from "@/lib/firebase/users"
+import { getFirebaseToken } from "@/lib/firebase/getFirebaseToken"
+import { useEffect, useState } from "react"
+
+interface BackendUser {
+  uidFirebase: string
+  nombre: string
+  email: string
+  score: number
+}
+
+interface User extends BackendUser {
+  rank: number
+}
 
 export default function Leaderboard() {
-  // Datos de ejemplo para la tabla de posiciones
-  const users = [
-    { rank: 1, name: "Carlos Mendoza", username: "carlosmendoza", xp: 1250, level: "Avanzado", streak: 15 },
-    { rank: 2, name: "Laura Sánchez", username: "laurasanchez", xp: 980, level: "Avanzado", streak: 12 },
-    { rank: 3, name: "Miguel Ángel", username: "miguelangel", xp: 875, level: "Intermedio", streak: 9 },
-    { rank: 4, name: "Sofía Rodríguez", username: "sofiarodriguez", xp: 820, level: "Intermedio", streak: 7 },
-    { rank: 5, name: "Javier López", username: "javierlopez", xp: 750, level: "Intermedio", streak: 10 },
-    { rank: 6, name: "Ana García", username: "anagarcia", xp: 450, level: "Intermedio", streak: 7 },
-    { rank: 7, name: "Pedro Martínez", username: "pedromartinez", xp: 420, level: "Principiante", streak: 5 },
-    { rank: 8, name: "Elena Gómez", username: "elenagomez", xp: 380, level: "Principiante", streak: 4 },
-    { rank: 9, name: "Daniel Fernández", username: "danielfernandez", xp: 320, level: "Principiante", streak: 3 },
-    { rank: 10, name: "María Torres", username: "mariatorres", xp: 290, level: "Principiante", streak: 2 },
-  ]
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
 
-  // Usuario actual (para destacarlo en la tabla)
-  const currentUser = "anagarcia"
+  useEffect(() => {
+    const token = getFirebaseToken().toString()
 
-  // Función para renderizar el icono de rango
+    const fetchData = async () => {
+      try {
+        const data: BackendUser[] = await getAllUsers(token)
+
+        // Ordena por score y asigna posición (rank)
+        const sorted: User[] = data
+          .slice()
+          .sort((a, b) => b.score - a.score)
+          .map((u, idx) => ({ ...u, rank: idx + 1 }))
+
+        setUsers(sorted)
+      } catch (error) {
+        console.error("Error fetching users:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
@@ -42,60 +67,34 @@ export default function Leaderboard() {
             Tabla de posiciones
           </h2>
 
-          <div className="tabs tabs-boxed my-4 justify-center">
-            <a className="tab tab-active">Global</a>
-            <a className="tab">Amigos</a>
-            <a className="tab">Semanal</a>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="table table-zebra">
-              <thead>
-                <tr>
-                  <th>Posición</th>
-                  <th>Usuario</th>
-                  <th className="text-center">Nivel</th>
-                  <th className="text-center">XP</th>
-                  <th className="text-center hidden md:table-cell">Racha</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.rank} className={user.username === currentUser ? "bg-base-200 font-medium" : ""}>
-                    <td className="flex items-center justify-center">{getRankIcon(user.rank)}</td>
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <div className="avatar placeholder">
-                          <div className="bg-neutral text-neutral-content rounded-full w-8">
-                            <span className="text-xs">
-                              {user.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </span>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="font-bold">{user.name}</div>
-                          <div className="text-sm opacity-70">@{user.username}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="text-center">
-                      <div className="badge badge-primary badge-sm">{user.level}</div>
-                    </td>
-                    <td className="text-center font-bold">{user.xp}</td>
-                    <td className="text-center hidden md:table-cell">
-                      <div className="flex items-center justify-center gap-1">
-                        <span className="text-warning">🔥</span>
-                        <span>{user.streak} días</span>
-                      </div>
-                    </td>
+          {loading ? (
+            <div className="text-center py-8">Cargando usuarios…</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="table table-zebra w-full">
+                <thead>
+                  <tr>
+                    <th>Posición</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th className="text-center">Puntuación</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.uidFirebase}>
+                      <td className="flex items-center justify-center">
+                        {getRankIcon(user.rank)}
+                      </td>
+                      <td>{user.nombre}</td>
+                      <td>{user.email}</td>
+                      <td className="text-center font-bold">{user.score}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           <div className="alert mt-6">
             <svg
@@ -108,13 +107,14 @@ export default function Leaderboard() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0
+                   11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <span>La tabla de posiciones se actualiza cada 24 horas.</span>
           </div>
         </div>
       </div>
     </Layout>
-  )
+  );
 }
