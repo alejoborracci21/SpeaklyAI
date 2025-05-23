@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebase';
@@ -23,8 +23,8 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
       return;
     }
 
-    if (password.length < 10) {
-      toast.error("La contraseña debe tener al menos 10 caracteres");
+    if (password.length < 5) {
+      toast.error("La contraseña debe tener al menos 5 caracteres");
       return;
     }
 
@@ -51,12 +51,6 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
     }
   };
 
-  useEffect(() => {
-    const unsub = auth.onAuthStateChanged(user => {
-      if (user) router.push('/speaklyAI/profile');
-    });
-    return () => unsub();
-  }, [router]);
 
   return (
     <div className="card w-full bg-base-100 shadow-xl p-8">

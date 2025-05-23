@@ -38,14 +38,10 @@ export default function Profile() {
 
         try {
           const token = await getFirebaseToken()
-          console.log('Token de Firebase:', token)
           if (!token) {
             console.error('No se pudo obtener el token de Firebase')
             return
           }
-          // const all: BackendUser[] = await getAllUsers(token.toString())
-          // const me = all.find((u) => u.uidFirebase === fbUser.uid) || null
-          // console.log('Usuario encontrado:', me)
           const user = await getUserInBackend(token.toString())
           if (!user) {
             console.error('No se encontró el usuario en el backend')
