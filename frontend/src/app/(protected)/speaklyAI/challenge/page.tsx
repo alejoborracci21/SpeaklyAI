@@ -7,7 +7,7 @@ import { getFirebaseToken } from '@/lib/firebase/getFirebaseToken'
 import { getAllChallenges, Challenge } from '@/lib/firebase/challenge'
 import { addScoreToUser } from '@/lib/firebase/users'
 import { useRouter } from 'next/navigation'
-
+import {getUserInBackend} from '@/lib/firebase/users'
 export default function Practice() {
   // — Estados de la práctica —
   const [questions, setQuestions] = useState<Challenge[]>([])
@@ -19,7 +19,23 @@ export default function Practice() {
   const [done, setDone] = useState(false)
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
   const router = useRouter()
-  const userLevel = 'Easy'
+
+
+  const userLevel = async () => {
+    const token = getFirebaseToken()
+    if (!token) throw new Error('No se obtuvo token de Firebase')
+    const user = await getUserInBackend(token.toString())
+
+
+    if (user.level >0 && user.level < 500) {
+      return 'Easy'
+    } else if (user.level >= 500 && user.level < 1000) {
+      return 'Medium'
+    } else {
+      return 'Hard'
+    }
+
+  }
 
   // — Al montar, llamamos a getAllChallenges y guardamos las preguntas —
   useEffect(() => {
@@ -27,7 +43,8 @@ export default function Practice() {
       try {
         const token = await getFirebaseToken()
         if (!token) throw new Error('No se obtuvo token de Firebase')
-        const data = await getAllChallenges(token.toString(), userLevel)
+        const data = await getAllChallenges(token.toString(), userLevel.toString())
+        console.log("🔍 challenges recibidos:", data);
         setQuestions(data)
       } catch (err) {
         console.error('Error cargando preguntas:', err)
