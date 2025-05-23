@@ -11,24 +11,24 @@ export function BottomNav() {
   }
 
   return (
-    <div className="btm-nav btm-nav-sm lg:hidden">
-      <Link href="/home" className={isActive("/home")}>
+    <div className="btm-nav btm-nav-sm hidden">
+      <Link href="/speaklyAI" className={isActive("/home")}>
         <Home className="h-5 w-5" />
         <span className="btm-nav-label">Inicio</span>
       </Link>
-      <Link href="/practice" className={isActive("/practice")}>
+      <Link href="/speaklyAI/practice" className={isActive("/practice")}>
         <BookOpen className="h-5 w-5" />
         <span className="btm-nav-label">Práctica</span>
       </Link>
-      <Link href="/profile" className={isActive("/profile")}>
+      <Link href="/speaklyAI/profile" className={isActive("/profile")}>
         <User className="h-5 w-5" />
         <span className="btm-nav-label">Perfil</span>
       </Link>
-      <Link href="/progress" className={isActive("/progress")}>
+      <Link href="/speaklyAI/progress" className={isActive("/progress")}>
         <BarChart2 className="h-5 w-5" />
         <span className="btm-nav-label">Progreso</span>
       </Link>
-      <Link href="/leaderboard" className={isActive("/leaderboard")}>
+      <Link href="/speaklyAI/ranking" className={isActive("/leaderboard")}>
         <Award className="h-5 w-5" />
         <span className="btm-nav-label">Ranking</span>
       </Link>
