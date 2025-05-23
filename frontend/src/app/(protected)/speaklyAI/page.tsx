@@ -19,9 +19,9 @@ export default function Home() {
         <div className="hero bg-base-200 rounded-box p-6">
           <div className="hero-content text-center">
             <div className="max-w-md">
-              <h1 className="text-3xl font-bold">¡Bienvenido a VocabMaster!</h1>
+              <h1 className="text-3xl font-bold">¡Bienvenido a SpeaklyAI!</h1>
               <p className="py-4">Mejora tu vocabulario en inglés día a día con nuestra plataforma impulsada por IA.</p>
-              <Link href="/practice" className="btn btn-primary">
+              <Link href="/speaklyAI/challenge" className="btn btn-primary">
                 Empezar ahora
               </Link>
             </div>
